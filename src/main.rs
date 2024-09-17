@@ -40,24 +40,41 @@
 use blockchainlib::*;
 
 fn main() {
+    let difficulty = 0x000fffffffffffffffffffffffffffff;
     let mut block = Block::new(
         0,
         now(),
         vec![0; 32],
         0,
         "Init Block".to_owned(),
-        0x000fffffffffffffffffffffffffffff,
+        difficulty,
     );
-
-    block.hash = block.hash();
-
-    println!("Before Mining: {:?}", &block);
 
     block.mine();
 
-    println!("After Mining: {:?}", &block);
+    println!("Mined Init Block: {:?}", &block);
+
+    let mut last_hash = block.hash.clone();
+
+    let mut blockchain = Blockchain {
+        blocks: vec![block],
+    };
+
+    println!("Verify: {}", &blockchain.verify());
+
+    // 1-to-10 (including 10)
+    for i in 1..=10 {
+        let mut block = Block::new(i, now(), last_hash, 0, "Block".to_owned(), difficulty);
+
+        block.mine();
+        last_hash = block.hash.clone(); //always previous hash
+
+        println!("Mined Block: {:?}", &block);
+        blockchain.blocks.push(block);
+
+        println!("Verify: {}", &blockchain.verify());
+    }
+    //test that this fails verification
+    // blockchain.blocks[3].index = 4;
+    // println!("Verify: {}", &blockchain.verify());
 }
-// NOTE: you can run this once, set your nonce to the (output) mined nonce, comment out the block.mine() line, and run again:
-// you will get the same block/hash
-//
-// this is a way to see how the nonce is arbitrarily changing as the computation occurs/loops (until the difficulty is overcome)
