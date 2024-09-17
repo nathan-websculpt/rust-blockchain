@@ -15,21 +15,49 @@
 // . Nonce: special number used for mining (for PoW verification)
 // . Previous block hash: cryptographic fingerprint of previous block
 // . Hash: cryptographic fingerprint of all of the above data concatenated together
-
+//
 // What is Hashing?
 // In a nutshell, a hash algorithm consists of a set of irreversible computations that can be
 // performed on a datum to generate a (usually) unique byte sequence.
+//
+//
+//
+// https://youtu.be/PZGlYa-6U5U?si=2MzizUJxpuDcT8Er&t=795
+// Mining Strategy (Algorithm)
+//
+// 1. Generate new nonce
+// 2. Hash bytes (this is the computationally heavy step)
+// 3. Check hash against difficulty
+//      a. Insufficient? Go back to step 1
+//      b. Sufficient? Continue to step 4
+// 4. Add block to chain
+// 5. Submit to peers, etc. Since this is out-of-scope for this video and we have no networking
+//    capabilities implemented (yet!), we'll just skip this step.
+//
+//
+//
 
 use blockchainlib::*;
 
 fn main() {
-    let mut block = Block::new(0, now(), vec![0; 32], 0, "Init Block".to_owned());
+    let mut block = Block::new(
+        0,
+        now(),
+        vec![0; 32],
+        0,
+        "Init Block".to_owned(),
+        0x000fffffffffffffffffffffffffffff,
+    );
 
-    println!("EMPTY {:?}", &block);
+    block.hash = block.hash();
 
-    let h = block.hash();
-    println!("block.hash: {:?}", &h);
+    println!("Before Mining: {:?}", &block);
 
-    block.hash = h;
-    println!("After Hashing: {:?}", &block);
+    block.mine();
+
+    println!("After Mining: {:?}", &block);
 }
+// NOTE: you can run this once, set your nonce to the (output) mined nonce, comment out the block.mine() line, and run again:
+// you will get the same block/hash
+//
+// this is a way to see how the nonce is arbitrarily changing as the computation occurs/loops (until the difficulty is overcome)
