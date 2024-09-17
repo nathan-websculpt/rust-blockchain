@@ -4,11 +4,10 @@ use std::fmt::{self, Debug, Formatter}; // from lib.rs
 pub struct Block {
     pub index: u32,
     pub timestamp: u128,
-    pub hash: BlockHash,
-    pub prev_block_hash: BlockHash,
+    pub hash: Hash,
+    pub prev_block_hash: Hash,
     pub nonce: u64,
-    // pub payload: Vec<u8>,
-    pub payload: String, //todo: will become transactions later
+    pub transactions: Vec<Transaction>,
     pub difficulty: u128,
 }
 
@@ -20,7 +19,7 @@ impl Debug for Block {
             &self.index,
             &hex::encode(&self.hash),
             &self.timestamp,
-            &self.payload,
+            &self.transactions.len(),
             &self.nonce,
         )
     }
@@ -31,9 +30,8 @@ impl Block {
     pub fn new(
         index: u32,
         timestamp: u128,
-        prev_block_hash: BlockHash,
-        nonce: u64,
-        payload: String,
+        prev_block_hash: Hash,
+        transactions: Vec<Transaction>,
         difficulty: u128,
     ) -> Self {
         //implicit return
@@ -42,8 +40,8 @@ impl Block {
             timestamp,
             hash: vec![0; 32],
             prev_block_hash,
-            nonce,
-            payload,
+            nonce: 0,
+            transactions,
             difficulty,
         }
     }
@@ -62,6 +60,7 @@ impl Block {
     }
 }
 
+// returns a vector of bytes representing the block's data.
 impl Hashable for Block {
     fn bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
@@ -71,13 +70,18 @@ impl Hashable for Block {
         bytes.extend(&u128_bytes(&self.timestamp));
         bytes.extend(&self.prev_block_hash);
         bytes.extend(&u64_bytes(&self.nonce));
-        bytes.extend(self.payload.as_bytes());
+        bytes.extend(
+            self.transactions
+                .iter()
+                .flat_map(|tx| tx.bytes())
+                .collect::<Vec<u8>>(),
+        );
         bytes.extend(&u128_bytes(&self.difficulty));
 
         bytes
     }
 }
 
-pub fn check_difficulty(hash: &BlockHash, difficulty: u128) -> bool {
+pub fn check_difficulty(hash: &Hash, difficulty: u128) -> bool {
     difficulty > difficulty_bytes_as_u128(&hash) // converting last 16 bytes to u128 integar, then doing greater-than comparison
 }

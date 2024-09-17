@@ -7,6 +7,8 @@ pub struct Output {
     pub value: u64,
 }
 
+// bytes serializes the Output (struct) instance into a vector of bytes, which can be used for hashing. 
+// it concatenates the bytes of to_addr and value into a single byte vector.
 impl Hashable for Output {
     fn bytes (&self) -> Vec<u8> {
         let mut bytes = vec![];
