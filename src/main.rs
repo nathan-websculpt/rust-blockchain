@@ -20,6 +20,16 @@
 // In a nutshell, a hash algorithm consists of a set of irreversible computations that can be
 // performed on a datum to generate a (usually) unique byte sequence.
 
+use blockchainlib::*;
+
 fn main() {
-    println!("Hello, world!");
+    let mut block = Block::new(0, now(), vec![0; 32], 0, "Init Block".to_owned());
+
+    println!("EMPTY {:?}", &block);
+
+    let h = block.hash();
+    println!("block.hash: {:?}", &h);
+
+    block.hash = h;
+    println!("After Hashing: {:?}", &block);
 }
