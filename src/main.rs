@@ -3,8 +3,6 @@
 // https://github.com/GeekLaunch/blockchain-rust
 // https://github.com/paradigmxyz/reth
 // https://github.com/rust-ethereum/evm
-//
-//
 
 //from: https://youtu.be/vJdT05zl6jk?si=w-42TmYtvgnUOSSf
 // Blocks contain this information:
@@ -40,6 +38,7 @@
 use blockchainlib::*;
 
 fn main() {
+    // let difficulty = 0xffffffffffffffffffffffffffffffff;
     let difficulty = 0x000fffffffffffffffffffffffffffff;
 
     // Create genesis block
